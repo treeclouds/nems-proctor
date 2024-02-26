@@ -43,11 +43,20 @@ from .serializers import SessionSerializer
             description="Filter sessions by proctor username.",
         ),
     ],
+    tags=["Session"],
 )
 class SessionViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows sessions to be viewed or edited.
+
+    Query Parameters:
+    - `taker`: Filter sessions by taker username.
+    - `exam`: Filter sessions by exam code.
+    - `proctor`: Filter sessions by proctor username.
+    """
+
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
-    tags = ["Session"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -74,6 +83,12 @@ class SessionViewSet(viewsets.ModelViewSet):
         parser_classes=[MultiPartParser, FormParser],
     )
     def add_photo(self, request, pk=None):
+        """
+        Add a photo to an active session.
+
+        An active session is required to add a new photo. If the session is closed,
+        the operation will be rejected.
+        """
         session = self.get_object()
 
         if not session.is_active:
@@ -101,6 +116,13 @@ class SessionViewSet(viewsets.ModelViewSet):
         parser_classes=[MultiPartParser, FormParser],
     )
     def add_record(self, request, pk=None):
+        """
+        API endpoint for managing session records.
+
+        Provides standard model viewset actions
+        for example: (list, create, retrieve, update, destroy)
+        to work with session records.
+        """
         session = self.get_object()
 
         if not session.is_active:
@@ -117,19 +139,41 @@ class SessionViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["Session Record"])
 class SessionRecordViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing session photos.
+
+    Supports actions to list, create, retrieve, update, and delete session photos.
+    """
+
     queryset = SessionRecord.objects.all()
     serializer_class = SessionRecordSerializer
     tags = ["Session Record"]
 
 
+@extend_schema(tags=["Session Photo"])
 class SessionPhotoViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing session records.
+
+    Supports actions to list, create, retrieve, update, and delete session photos.
+    """
+
     queryset = SessionPhoto.objects.all()
     serializer_class = SessionPhotoSerializer
     tags = ["Session Photo"]
 
 
+@extend_schema(tags=["Session"])
 class GetTakersByExam(APIView):
+    """
+    Retrieve a list of takers for a given exam code.
+
+    This endpoint provides a distinct list of users (takers)
+    who have sessions associated with the specified exam.
+    """
+
     def get(self, request, exam_code):
         exam = get_object_or_404(Exam, exam_code=exam_code)
         sessions = Session.objects.filter(exam=exam).distinct("taker__id")
