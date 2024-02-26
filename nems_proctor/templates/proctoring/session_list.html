@@ -1,0 +1,19 @@
+<!-- templates/proctoring/session_list.html -->
+{% extends "base.html" %}
+
+<!-- Assuming you have a base.html template -->
+{% block content %}
+  <h2>Exam Sessions</h2>
+  <ul>
+    {% for session in sessions %}
+      <li>
+        {{ session.exam.title }} - {{ session.taker.username }} -
+        {% if session.is_active %}
+          Active
+        {% else %}
+          Completed
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock content %}
