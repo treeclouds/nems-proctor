@@ -15,6 +15,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from users.api.serializers import UserSerializer
 
+from nems_proctor.users.models import User
+
 from .serializers import SessionPhotoCreateSerializer
 from .serializers import SessionPhotoSerializer
 from .serializers import SessionRecordCreateSerializer
@@ -57,6 +59,7 @@ class SessionViewSet(viewsets.ModelViewSet):
 
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
+    lookup_field = "session_id"
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -149,7 +152,7 @@ class SessionRecordViewSet(viewsets.ModelViewSet):
 
     queryset = SessionRecord.objects.all()
     serializer_class = SessionRecordSerializer
-    tags = ["Session Record"]
+    lookup_field = "record_id"
 
 
 @extend_schema(tags=["Session Photo"])
@@ -162,7 +165,20 @@ class SessionPhotoViewSet(viewsets.ModelViewSet):
 
     queryset = SessionPhoto.objects.all()
     serializer_class = SessionPhotoSerializer
-    tags = ["Session Photo"]
+    lookup_field = "photo_id"
+
+
+@extend_schema(tags=["Exam"])
+class ExamViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing exams.
+
+    Supports actions to list, create, retrieve, update, and delete exams.
+    """
+
+    queryset = Exam.objects.all()
+    serializer_class = SessionSerializer
+    lookup_field = "exam_id"
 
 
 @extend_schema(tags=["Session"])
@@ -174,6 +190,8 @@ class GetTakersByExam(APIView):
     who have sessions associated with the specified exam.
     """
 
+    serializer_class = UserSerializer
+
     def get(self, request, exam_code):
         exam = get_object_or_404(Exam, exam_code=exam_code)
         sessions = Session.objects.filter(exam=exam).distinct("taker__id")
@@ -182,3 +200,82 @@ class GetTakersByExam(APIView):
         serializer = UserSerializer(takers, many=True, context={"request": request})
 
         return Response(serializer.data)
+
+
+@extend_schema(tags=["Session"])
+class GetSessionsByExamAndTaker(APIView):
+    """
+    Retrieve a list of sessions for a given exam code and taker username.
+
+    This endpoint provides a list of sessions
+    who have the specified exam code and taker username.
+    """
+
+    serializer_class = SessionSerializer
+
+    def get(self, request, exam_code, taker_username):
+        exam = get_object_or_404(Exam, exam_code=exam_code)
+        taker = get_object_or_404(User, username=taker_username)
+        sessions = Session.objects.filter(exam=exam, taker=taker)
+        serializer = self.serializer_class(
+            sessions,
+            many=True,
+            context={"request": request},
+        )
+
+        return Response(serializer.data)
+
+
+@extend_schema(tags=["Session"])
+class GetSessionsPhotoBySession(APIView):
+    """
+    Retrieve a list of photos for a given session id.
+
+    This endpoint provides a list of photos
+    who have sessions associated with the specified session id.
+    """
+
+    serializer_class = SessionPhotoSerializer
+
+    def get(self, request, session_id):
+        session = get_object_or_404(Session, id=session_id)
+        photos = SessionPhoto.objects.filter(session=session)
+        serializer = self.serializer_class(
+            photos,
+            many=True,
+            context={"request": request},
+        )
+        data = {
+            "count": photos.count(),
+            "photos": serializer.data,
+        }
+
+        return Response(data)
+
+
+@extend_schema(tags=["Session"])
+class GetSessionsRecordBySession(APIView):
+    """
+    Retrieve a list of records for a given session id.
+
+    This endpoint provides a list of records
+    who have sessions associated with the specified session id.
+    """
+
+    serializer_class = SessionRecordSerializer
+
+    def get(self, request, session_id):
+        session = get_object_or_404(Session, id=session_id)
+        records = SessionRecord.objects.filter(session=session)
+        serializer = self.serializer_class(
+            records,
+            many=True,
+            context={"request": request},
+        )
+
+        data = {
+            "count": records.count(),
+            "records": serializer.data,
+        }
+
+        return Response(data)

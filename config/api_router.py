@@ -2,6 +2,7 @@ from django.conf import settings
 from rest_framework.routers import DefaultRouter
 from rest_framework.routers import SimpleRouter
 
+from nems_proctor.proctoring.api.views import ExamViewSet
 from nems_proctor.proctoring.api.views import SessionPhotoViewSet
 from nems_proctor.proctoring.api.views import SessionRecordViewSet
 from nems_proctor.proctoring.api.views import SessionViewSet
@@ -13,6 +14,7 @@ router.register("users", UserViewSet)
 router.register("sessions", SessionViewSet)
 router.register("session-photos", SessionPhotoViewSet)
 router.register("session-records", SessionRecordViewSet)
+router.register("Exam", ExamViewSet, basename="exam")
 
 
 app_name = "api"
