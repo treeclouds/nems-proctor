@@ -2,10 +2,6 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import OpenApiTypes
 from drf_spectacular.utils import extend_schema
-from nems_proctor.proctoring.models import Exam
-from nems_proctor.proctoring.models import Session
-from nems_proctor.proctoring.models import SessionPhoto
-from nems_proctor.proctoring.models import SessionRecord
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -13,8 +9,12 @@ from rest_framework.parsers import FormParser
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from nems_proctor.users.api.serializers import UserSerializer
 
+from nems_proctor.proctoring.models import Exam
+from nems_proctor.proctoring.models import Session
+from nems_proctor.proctoring.models import SessionPhoto
+from nems_proctor.proctoring.models import SessionRecord
+from nems_proctor.users.api.serializers import UserSerializer
 from nems_proctor.users.models import User
 
 from .serializers import SessionPhotoCreateSerializer

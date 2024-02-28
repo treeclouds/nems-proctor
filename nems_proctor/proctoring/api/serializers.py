@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
 from nems_proctor.proctoring.models import Exam
 from nems_proctor.proctoring.models import Session
 from nems_proctor.proctoring.models import SessionPhoto
 from nems_proctor.proctoring.models import SessionRecord
-from rest_framework import serializers
 
 
 class SessionSerializer(serializers.ModelSerializer):
