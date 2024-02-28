@@ -44,7 +44,7 @@ urlpatterns += [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
-    path("api/v1/", include("proctoring.api.urls")),
+    path("api/v1/", include("nems_proctor.proctoring.api.urls")),
 ]
 
 if settings.DEBUG:

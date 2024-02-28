@@ -85,7 +85,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "nems_proctor.users",
-    "nems_proctor.proctoring",
+    "nems_proctor.proctoring.apps.ProctoringConfig",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
