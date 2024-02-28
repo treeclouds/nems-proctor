@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.utils import timezone
 
 
 class RecordingType(models.TextChoices):
@@ -74,6 +75,21 @@ class Session(models.Model):
         including exam title and taker username.
         """
         return f"Session for '{self.exam.exam_title}' by {self.taker.username}"
+
+    def start_session(self):
+        """
+        Sets the start time of the session to the current time.
+        """
+        self.start_time = timezone.now()
+        self.save()
+
+    def end_session(self):
+        """
+        Sets the end time of the session to the current time.
+        """
+        self.end_time = timezone.now()
+        self.is_active = False
+        self.save()
 
 
 class SessionRecord(models.Model):

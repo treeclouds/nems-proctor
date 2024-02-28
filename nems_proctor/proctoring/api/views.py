@@ -59,7 +59,6 @@ class SessionViewSet(viewsets.ModelViewSet):
 
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
-    lookup_field = "session_id"
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -74,6 +73,37 @@ class SessionViewSet(viewsets.ModelViewSet):
         if proctor_username:
             queryset = queryset.filter(proctor__username=proctor_username)
         return queryset
+
+    @action(detail=False, methods=["post"], url_path="start_session")
+    def start_session(self, request):
+        serializer = SessionSerializer(data=request.data)  # Use your updated serializer
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=["post"], url_path="end_session")
+    def end_session(self, request, pk=None):
+        """
+        Ends an active session. Only authenticated users can end sessions.
+        """
+        session = self.get_queryset().get(pk=pk)
+
+        if not session.is_active:
+            error_message = "This session is already closed."
+            return Response(
+                {"detail": f"{error_message}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        session.is_active = False
+        session.save()
+
+        return Response(
+            {"detail": "Session successfully ended."},
+            status=status.HTTP_200_OK,
+        )
 
     @extend_schema(
         request=SessionPhotoCreateSerializer,
@@ -152,7 +182,6 @@ class SessionRecordViewSet(viewsets.ModelViewSet):
 
     queryset = SessionRecord.objects.all()
     serializer_class = SessionRecordSerializer
-    lookup_field = "record_id"
 
 
 @extend_schema(tags=["Session Photo"])
@@ -165,7 +194,6 @@ class SessionPhotoViewSet(viewsets.ModelViewSet):
 
     queryset = SessionPhoto.objects.all()
     serializer_class = SessionPhotoSerializer
-    lookup_field = "photo_id"
 
 
 @extend_schema(tags=["Exam"])
@@ -178,7 +206,6 @@ class ExamViewSet(viewsets.ModelViewSet):
 
     queryset = Exam.objects.all()
     serializer_class = SessionSerializer
-    lookup_field = "exam_id"
 
 
 @extend_schema(tags=["Session"])
