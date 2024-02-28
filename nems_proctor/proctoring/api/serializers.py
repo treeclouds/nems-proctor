@@ -27,6 +27,26 @@ class SessionSerializer(serializers.ModelSerializer):
         model = Session
         fields = "__all__"
 
+    def create(self, validated_data):
+        taker_data = validated_data.get("taker")
+        if isinstance(taker_data, str):
+            user = get_user_model()
+            taker, created = user.objects.get_or_create(username=taker_data)
+            validated_data["taker"] = taker
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        taker_data = validated_data.get("taker")
+        if taker_data and isinstance(taker_data, str):
+            user = get_user_model()
+            taker, created = user.objects.get_or_create(username=taker_data)
+            validated_data["taker"] = taker
+        return super().update(instance, validated_data)
+
+    def end_session(self, instance, validated_data):
+        instance.end_session()
+        return super().update(instance, validated_data)
+
 
 class SessionRecordSerializer(serializers.ModelSerializer):
     class Meta:
