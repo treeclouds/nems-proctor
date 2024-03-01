@@ -17,6 +17,7 @@ from nems_proctor.proctoring.models import SessionRecord
 from nems_proctor.users.api.serializers import UserSerializer
 from nems_proctor.users.models import User
 
+from .serializers import ExamSerializer
 from .serializers import SessionPhotoCreateSerializer
 from .serializers import SessionPhotoSerializer
 from .serializers import SessionRecordCreateSerializer
@@ -205,7 +206,7 @@ class ExamViewSet(viewsets.ModelViewSet):
     """
 
     queryset = Exam.objects.all()
-    serializer_class = SessionSerializer
+    serializer_class = ExamSerializer
 
 
 @extend_schema(tags=["Session"])

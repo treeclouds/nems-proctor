@@ -191,7 +191,12 @@ LOGGING = {
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [
-    {"url": "https://example.com", "description": "Production server"},
+    {"url": "https://proctor.bawana.com", "description": "Production server"},
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+CORS_ALLOWED_ORIGINS = [
+    "https://proctor.bawana.com",
+    "https://www.proctor.bawana.com",
+]
