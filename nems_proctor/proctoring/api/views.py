@@ -22,6 +22,7 @@ from .serializers import SessionPhotoSerializer
 from .serializers import SessionRecordCreateSerializer
 from .serializers import SessionRecordSerializer
 from .serializers import SessionSerializer
+from .serializers import ExamSerializer
 
 
 @extend_schema(
@@ -205,7 +206,7 @@ class ExamViewSet(viewsets.ModelViewSet):
     """
 
     queryset = Exam.objects.all()
-    serializer_class = SessionSerializer
+    serializer_class = ExamSerializer
 
 
 @extend_schema(tags=["Session"])
