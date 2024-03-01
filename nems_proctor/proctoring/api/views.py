@@ -17,12 +17,12 @@ from nems_proctor.proctoring.models import SessionRecord
 from nems_proctor.users.api.serializers import UserSerializer
 from nems_proctor.users.models import User
 
+from .serializers import ExamSerializer
 from .serializers import SessionPhotoCreateSerializer
 from .serializers import SessionPhotoSerializer
 from .serializers import SessionRecordCreateSerializer
 from .serializers import SessionRecordSerializer
 from .serializers import SessionSerializer
-from .serializers import ExamSerializer
 
 
 @extend_schema(
