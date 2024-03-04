@@ -24,6 +24,18 @@ from .serializers import SessionRecordCreateSerializer
 from .serializers import SessionRecordSerializer
 from .serializers import SessionSerializer
 
+sort_param = OpenApiParameter(
+    name="sort",
+    type="string",
+    enum=["asc", "desc"],
+    default="asc",
+    description="""
+        Sort order for taker username.
+        Values: 'asc' (ascending), 'desc' (descending).
+        Default is 'asc'.
+        """,
+)
+
 
 @extend_schema(
     parameters=[
@@ -230,7 +242,21 @@ class GetTakersByExam(APIView):
         return Response(serializer.data)
 
 
-@extend_schema(tags=["Session"])
+@extend_schema(
+    tags=["Session"],
+    parameters=[
+        OpenApiParameter(
+            name="sort",
+            type=OpenApiTypes.STR,
+            description="""
+            Sorts the sessions by ID.
+            Use 'asc' for ascending or 'desc' for descending order.
+            Default is 'asc'.
+            """,
+            required=False,
+        ),
+    ],
+)
 class GetSessionsByExamAndTaker(APIView):
     """
     Retrieve a list of sessions for a given exam code and taker username.
@@ -244,7 +270,12 @@ class GetSessionsByExamAndTaker(APIView):
     def get(self, request, exam_code, taker_username):
         exam = get_object_or_404(Exam, exam_code=exam_code)
         taker = get_object_or_404(User, username=taker_username)
-        sessions = Session.objects.filter(exam=exam, taker=taker)
+
+        sort_order = request.query_params.get("sort", "asc")
+        order_by = "-id" if sort_order == "desc" else "id"
+
+        sessions = Session.objects.filter(exam=exam, taker=taker).order_by(order_by)
+
         serializer = self.serializer_class(
             sessions,
             many=True,
