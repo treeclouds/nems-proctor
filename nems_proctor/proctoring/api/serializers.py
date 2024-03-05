@@ -5,6 +5,7 @@ from nems_proctor.proctoring.models import Exam
 from nems_proctor.proctoring.models import Session
 from nems_proctor.proctoring.models import SessionPhoto
 from nems_proctor.proctoring.models import SessionRecord
+from nems_proctor.users.models import User
 
 
 class SessionSerializer(serializers.ModelSerializer):
@@ -78,3 +79,12 @@ class ExamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Exam
         fields = "__all__"
+
+
+class GetTakersByExamSerializer(serializers.ModelSerializer):
+    attempts_count = serializers.IntegerField(read_only=True)
+    latest_attempt = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ("id", "username", "attempts_count", "latest_attempt")
