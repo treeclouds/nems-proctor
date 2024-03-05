@@ -1,3 +1,5 @@
+from django.db.models import Count
+from django.db.models import Max
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.utils import OpenApiTypes
@@ -14,10 +16,10 @@ from nems_proctor.proctoring.models import Exam
 from nems_proctor.proctoring.models import Session
 from nems_proctor.proctoring.models import SessionPhoto
 from nems_proctor.proctoring.models import SessionRecord
-from nems_proctor.users.api.serializers import UserSerializer
 from nems_proctor.users.models import User
 
 from .serializers import ExamSerializer
+from .serializers import GetTakersByExamSerializer
 from .serializers import SessionPhotoCreateSerializer
 from .serializers import SessionPhotoSerializer
 from .serializers import SessionRecordCreateSerializer
@@ -223,22 +225,35 @@ class ExamViewSet(viewsets.ModelViewSet):
 
 @extend_schema(tags=["Session"])
 class GetTakersByExam(APIView):
-    """
-    Retrieve a list of takers for a given exam code.
-
-    This endpoint provides a distinct list of users (takers)
-    who have sessions associated with the specified exam.
-    """
-
-    serializer_class = UserSerializer
+    serializer_class = GetTakersByExamSerializer
 
     def get(self, request, exam_code):
         exam = get_object_or_404(Exam, exam_code=exam_code)
-        sessions = Session.objects.filter(exam=exam).distinct("taker__id")
-        takers = [session.taker for session in sessions]
+        sessions = (
+            Session.objects.filter(exam=exam)
+            .values("taker")
+            .annotate(attempts_count=Count("id"), latest_attempt=Max("start_time"))
+            .order_by("taker")
+        )
 
-        serializer = UserSerializer(takers, many=True, context={"request": request})
+        # Map session data to taker IDs
+        session_data_map = {session["taker"]: session for session in sessions}
 
+        # Fetch the user instances
+        user_ids = session_data_map.keys()
+        users = User.objects.filter(id__in=user_ids)
+
+        # Annotate users with session data
+        for user in users:
+            user_data = session_data_map.get(user.id)
+            user.attempts_count = user_data["attempts_count"]
+            user.latest_attempt = user_data["latest_attempt"]
+
+        serializer = self.serializer_class(
+            users,
+            many=True,
+            context={"request": request},
+        )
         return Response(serializer.data)
 
 
@@ -275,14 +290,18 @@ class GetSessionsByExamAndTaker(APIView):
         order_by = "-id" if sort_order == "desc" else "id"
 
         sessions = Session.objects.filter(exam=exam, taker=taker).order_by(order_by)
+        session_count = sessions.count()
 
-        serializer = self.serializer_class(
-            sessions,
-            many=True,
-            context={"request": request},
-        )
+        data = {
+            "count": session_count,
+            "sessions": self.serializer_class(
+                sessions,
+                many=True,
+                context={"request": request},
+            ).data,
+        }
 
-        return Response(serializer.data)
+        return Response(data)
 
 
 @extend_schema(tags=["Session"])
