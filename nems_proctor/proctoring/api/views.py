@@ -291,9 +291,15 @@ class GetSessionsByExamAndTaker(APIView):
 
         sessions = Session.objects.filter(exam=exam, taker=taker).order_by(order_by)
         session_count = sessions.count()
+        session_photo_count = SessionPhoto.objects.filter(session__in=sessions).count()
+        session_record_count = SessionRecord.objects.filter(
+            session__in=sessions,
+        ).count()
 
         data = {
             "count": session_count,
+            "photo_count": session_photo_count,
+            "record_count": session_record_count,
             "sessions": self.serializer_class(
                 sessions,
                 many=True,
