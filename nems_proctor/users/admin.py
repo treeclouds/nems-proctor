@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext_lazy as _
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
 
 from nems_proctor.users.forms import UserAdminChangeForm
 from nems_proctor.users.forms import UserAdminCreationForm
@@ -14,10 +16,18 @@ if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
     admin.site.login = login_required(admin.site.login)  # type: ignore[method-assign]
 
 
+class UserResource(resources.ModelResource):
+    class Meta:
+        model = User
+        fields = ("id", "username", "name", "is_active", "is_staff")
+        export_order = ("id", "username", "name", "is_active", "is_staff")
+
+
 @admin.register(User)
-class UserAdmin(auth_admin.UserAdmin):
+class UserAdmin(auth_admin.UserAdmin, ImportExportModelAdmin):
     form = UserAdminChangeForm
     add_form = UserAdminCreationForm
+    resource_class = UserResource
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("name", "email")}),
