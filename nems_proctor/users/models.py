@@ -3,8 +3,10 @@ from django.db.models import CharField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from nems_proctor.core.models import BaseModel
 
-class User(AbstractUser):
+
+class User(AbstractUser, BaseModel):
     """
     Default custom user model for nems-proctor.
     If adding fields that need to be filled at user signup,
