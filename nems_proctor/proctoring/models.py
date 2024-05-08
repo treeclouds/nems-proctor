@@ -4,6 +4,8 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone
 
+from nems_proctor.core.models import BaseModel
+
 
 class RecordingType(models.TextChoices):
     """Defines the types of recordings that can be associated with a session."""
@@ -13,7 +15,7 @@ class RecordingType(models.TextChoices):
     SCREENSHOT = "screenshot", "Screenshot"
 
 
-class Exam(models.Model):
+class Exam(BaseModel):
     exam_title = models.CharField(
         max_length=255,
         verbose_name="Exam Title",
@@ -44,7 +46,7 @@ class Exam(models.Model):
         return f"{self.exam_title} ({self.exam_code})"
 
 
-class Session(models.Model):
+class Session(BaseModel):
     """
     Represents an exam session,
     including details about the exam, participant, and proctor
@@ -67,6 +69,7 @@ class Session(models.Model):
     )
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
+    duration = models.DurationField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -74,7 +77,9 @@ class Session(models.Model):
         Returns a string representation of the session,
         including exam title and taker username.
         """
-        return f"Session for '{self.exam.exam_title}' by {self.taker.username}"
+        return (
+            f"Session {self.pk} for '{self.exam.exam_title}' by {self.taker.username}"
+        )
 
     def start_session(self):
         """
@@ -92,7 +97,7 @@ class Session(models.Model):
         self.save()
 
 
-class SessionRecord(models.Model):
+class SessionRecord(BaseModel):
     """
     Stores a record associated with a session,
     including type and file of the recording.
@@ -142,7 +147,7 @@ class SessionRecord(models.Model):
             raise ValidationError(error_message)
 
 
-class SessionPhoto(models.Model):
+class SessionPhoto(BaseModel):
     """
     Represents a photo taken during a session,
     storing the image file and capture time.

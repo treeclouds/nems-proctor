@@ -20,6 +20,7 @@ class SessionPhotoInline(admin.TabularInline):
 class SessionAdmin(admin.ModelAdmin):
     inlines = [SessionRecordInline, SessionPhotoInline]
     list_display = (
+        "id",
         "exam",
         "taker",
         "proctor",
