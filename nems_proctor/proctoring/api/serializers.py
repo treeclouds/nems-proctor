@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import ObjectDoesNotExist
 from rest_framework import serializers
 
 from nems_proctor.proctoring.models import Exam
@@ -8,8 +9,18 @@ from nems_proctor.proctoring.models import SessionRecord
 from nems_proctor.users.models import User
 
 
+class CreateUserSlugRelatedField(serializers.SlugRelatedField):
+    def to_internal_value(self, data):
+        try:
+            return self.get_queryset().get(**{self.slug_field: data})
+        except ObjectDoesNotExist:
+            user_model = get_user_model()
+            user, created = user_model.objects.get_or_create(username=data)
+            return user
+
+
 class SessionSerializer(serializers.ModelSerializer):
-    taker = serializers.SlugRelatedField(
+    taker = CreateUserSlugRelatedField(
         slug_field="username",
         queryset=get_user_model().objects.all(),
     )
@@ -29,19 +40,9 @@ class SessionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        taker_data = validated_data.get("taker")
-        if isinstance(taker_data, str):
-            user = get_user_model()
-            taker, created = user.objects.get_or_create(username=taker_data)
-            validated_data["taker"] = taker
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        taker_data = validated_data.get("taker")
-        if taker_data and isinstance(taker_data, str):
-            user = get_user_model()
-            taker, created = user.objects.get_or_create(username=taker_data)
-            validated_data["taker"] = taker
         return super().update(instance, validated_data)
 
     def end_session(self, instance, validated_data):
