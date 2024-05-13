@@ -23,3 +23,5 @@ django-cors-headers==4.3.1  # https://github.com/adamchainz/django-cors-headers
 # DRF-spectacular for api documentation
 drf-spectacular==0.27.1  # https://github.com/tfranzel/drf-spectacular
 django-import-export==3.3.7  # https://github.com/django-import-export/django-import-export
+sqlparse>=0.5.0 # not directly required, pinned by Snyk to avoid a vulnerability
+tornado>=6.3.3 # not directly required, pinned by Snyk to avoid a vulnerability
