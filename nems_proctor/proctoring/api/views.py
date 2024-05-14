@@ -296,15 +296,22 @@ class GetSessionsByExamAndTaker(APIView):
             session__in=sessions,
         ).count()
 
+        sessions_data = []
+        for session in sessions:
+            session_data = self.serializer_class(
+                session,
+                context={"request": request},
+            ).data
+            session_data["photo_count"] = SessionPhoto.objects.filter(
+                session=session,
+            ).count()
+            sessions_data.append(session_data)
+
         data = {
             "count": session_count,
             "photo_count": session_photo_count,
             "record_count": session_record_count,
-            "sessions": self.serializer_class(
-                sessions,
-                many=True,
-                context={"request": request},
-            ).data,
+            "sessions": sessions_data,
         }
 
         return Response(data)
