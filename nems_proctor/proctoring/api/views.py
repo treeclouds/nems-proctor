@@ -9,6 +9,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser
 from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -221,6 +222,17 @@ class ExamViewSet(viewsets.ModelViewSet):
 
     queryset = Exam.objects.all()
     serializer_class = ExamSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_company_id = self.request.user.company_id
+        return Exam.objects.filter(company_id=user_company_id)
+
+    def perform_create(self, serializer):
+        serializer.save(company_id=self.request.user.company_id)
+
+    def perform_update(self, serializer):
+        serializer.save(company_id=self.request.user.company_id)
 
 
 @extend_schema(tags=["Session"])

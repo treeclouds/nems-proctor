@@ -40,6 +40,7 @@ class UserAdmin(auth_admin.UserAdmin, ImportExportModelAdmin):
                     "is_superuser",
                     "groups",
                     "user_permissions",
+                    "company_id",
                 ),
             },
         ),
