@@ -96,6 +96,11 @@ class Session(BaseModel):
         self.is_active = False
         self.save()
 
+    def save(self, *args, **kwargs):
+        if not self.company_id:
+            self.company_id = self.taker.company_id
+        super().save(*args, **kwargs)
+
 
 class SessionRecord(BaseModel):
     """
@@ -146,6 +151,11 @@ class SessionRecord(BaseModel):
                 Allowed extensions: {valid_extensions[self.recording_type]}."""
             raise ValidationError(error_message)
 
+    def save(self, *args, **kwargs):
+        if not self.company_id:
+            self.company_id = self.session.taker.company_id
+        super().save(*args, **kwargs)
+
 
 class SessionPhoto(BaseModel):
     """
@@ -163,3 +173,8 @@ class SessionPhoto(BaseModel):
         including session ID and capture time.
         """
         return f"Photo for session {self.session.id} captured at {self.captured_at}"
+
+    def save(self, *args, **kwargs):
+        if not self.company_id:
+            self.company_id = self.session.taker.company_id
+        super().save(*args, **kwargs)
