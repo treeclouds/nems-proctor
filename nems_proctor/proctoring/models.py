@@ -38,6 +38,15 @@ class Exam(BaseModel):
         verbose_name="Last Updated",
     )
 
+    # get latest session using the exam
+    # query sessions using the exam from Session model
+    def get_latest_session(self):
+        """
+        Returns the latest session for this exam.
+        If no sessions exist, returns None.
+        """
+        return self.session_set.order_by("-start_time").first()
+
     class Meta:
         verbose_name = "Exam"
         verbose_name_plural = "Exams"
