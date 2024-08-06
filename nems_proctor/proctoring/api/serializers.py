@@ -77,9 +77,16 @@ class SessionPhotoCreateSerializer(serializers.ModelSerializer):
 
 
 class ExamSerializer(serializers.ModelSerializer):
+    latest_session_end_time = serializers.SerializerMethodField()
+
     class Meta:
         model = Exam
         fields = "__all__"
+
+    def get_latest_session_end_time(self, obj):
+        # 'obj' here is an instance of the Exam model
+        latest_session = obj.get_latest_session()
+        return latest_session.start_time if latest_session else None
 
 
 class GetTakersByExamSerializer(serializers.ModelSerializer):
