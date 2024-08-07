@@ -25,3 +25,4 @@ drf-spectacular==0.27.1  # https://github.com/tfranzel/drf-spectacular
 django-import-export==3.3.7  # https://github.com/django-import-export/django-import-export
 sqlparse>=0.5.0 # not directly required, pinned by Snyk to avoid a vulnerability
 requests>=2.32.0 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
