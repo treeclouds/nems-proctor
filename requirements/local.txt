@@ -35,6 +35,7 @@ django-coverage-plugin==3.1.0  # https://github.com/nedbat/django_coverage_plugi
 pytest-django==4.8.0  # https://github.com/pytest-dev/pytest-django
 sqlparse>=0.5.0 # not directly required, pinned by Snyk to avoid a vulnerability
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
-ipython>=7.16.3 # not directly required, pinned by Snyk to avoid a vulnerability
+ipython>=8.10.0 # not directly required, pinned by Snyk to avoid a vulnerability
 prompt-toolkit>=3.0.13 # not directly required, pinned by Snyk to avoid a vulnerability
 pygments>=2.15.0 # not directly required, pinned by Snyk to avoid a vulnerability
+setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
