@@ -8,11 +8,10 @@ from import_export.admin import ImportExportModelAdmin
 
 from nems_proctor.users.forms import UserAdminChangeForm
 from nems_proctor.users.forms import UserAdminCreationForm
+from nems_proctor.users.models import BaseImage
 from nems_proctor.users.models import User
 
 if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
-    # Force the `admin` sign in process to go through the `django-allauth` workflow:
-    # https://docs.allauth.org/en/latest/common/admin.html#admin
     admin.site.login = login_required(admin.site.login)  # type: ignore[method-assign]
 
 
@@ -48,3 +47,35 @@ class UserAdmin(auth_admin.UserAdmin, ImportExportModelAdmin):
     )
     list_display = ["username", "name", "is_superuser"]
     search_fields = ["name"]
+
+
+class BaseImageResource(resources.ModelResource):
+    class Meta:
+        model = BaseImage
+        fields = ("id", "user", "image", "uploaded_at")
+        export_order = ("id", "user", "image", "uploaded_at")
+
+
+@admin.register(BaseImage)
+class BaseImageAdmin(ImportExportModelAdmin):
+    resource_class = BaseImageResource
+    list_display = ["id", "user", "company_id", "image_preview", "uploaded_at"]
+    list_filter = ["uploaded_at", "user", "company_id"]
+    search_fields = ["user__username", "user__name", "company_id"]
+    readonly_fields = ["image_preview", "uploaded_at", "company_id"]
+    raw_id_fields = ["user"]
+
+    @admin.display(
+        description="Image Preview",
+    )
+    def image_preview(self, obj):
+        if obj.image:
+            return f'<img src="{obj.image.url}" width="100" />'
+        return "No Image"
+
+
+class BaseImageResource(resources.ModelResource):
+    class Meta:
+        model = BaseImage
+        fields = ("id", "user", "company_id", "image", "uploaded_at")
+        export_order = ("id", "user", "company_id", "image", "uploaded_at")
