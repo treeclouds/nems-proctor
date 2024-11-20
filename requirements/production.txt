@@ -11,3 +11,4 @@ Collectfast==2.2.0  # https://github.com/antonagestam/collectfast
 django-storages[s3]==1.14.2  # https://github.com/jschneier/django-storages
 django-anymail[amazon-ses]==10.2  # https://github.com/anymail/django-anymail
 sqlparse>=0.5.0 # not directly required, pinned by Snyk to avoid a vulnerability
+django>=4.2.14 # not directly required, pinned by Snyk to avoid a vulnerability
