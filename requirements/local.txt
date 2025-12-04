@@ -33,8 +33,9 @@ django-debug-toolbar==4.3.0  # https://github.com/jazzband/django-debug-toolbar
 django-extensions==3.2.3  # https://github.com/django-extensions/django-extensions
 django-coverage-plugin==3.1.0  # https://github.com/nedbat/django_coverage_plugin
 pytest-django==4.8.0  # https://github.com/pytest-dev/pytest-django
-sqlparse>=0.5.0 # not directly required, pinned by Snyk to avoid a vulnerability
+sqlparse>=0.5.4 # not directly required, pinned by Snyk to avoid a vulnerability
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
 ipython>=7.16.3 # not directly required, pinned by Snyk to avoid a vulnerability
 prompt-toolkit>=3.0.13 # not directly required, pinned by Snyk to avoid a vulnerability
 pygments>=2.15.0 # not directly required, pinned by Snyk to avoid a vulnerability
+django>=4.2.27 # not directly required, pinned by Snyk to avoid a vulnerability
